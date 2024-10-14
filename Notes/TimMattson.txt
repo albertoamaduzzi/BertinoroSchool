@@ -1,0 +1,52 @@
+1989 Processor: ALU organized pipeline in 5 stages
+1) Fetch
+2) Decode Instruction
+3) Translate memory addresses and displacements for instrution
+4) Execute Instruction
+5) Retire Instruction
+----------------------------------
+1993 Pentium: Super scalar execution. 
+- You have a multiple pipeline
+- Branch prediction -> so it starts execution ahead of the next extraction
+	If you get the wrong speculation you 
+- Separate L1 cache 
+	1) Instruction
+	2) Data
+Unified cache contains both the types of caches.
+---------------------------------
+1995 Pentium Pro:
+- Names the registers and reorders them automatically. (You do not need to be very careful) "Register re-order buffer"
+You input x86 instructions -> decodes in micro-opration -> in RISC.
+Front hand (CISC)
+They are launched into RISC looking for data.
+The instructions are gonna be run out of order and are read in order.
+NOTE: You have a lot of pipelines 
+2002
+In any micro-processor (GPU,CPU,FPGA) you need to make work everything. How are you sure to keep busy the processes?
+Two front-hand (decode instruction) and given to give to back hand (It double the cores "Hyper-threading") -> Hardware support Program Counter, File Counter, Register -Files
+This does not care about power that explodes.
+2003 Dothan-Banias -> diminished power consumption.
+Interacting register- L1 cache is 4 cycòes. 12 cycles to L2, L3 cache 26 cycles, 230-360 cycles for main memory.
+
+
+Performance is memory usage. Computation is free (10^-3)
+When you use cycles you bolck the cache of a block. For example all the array. Cache is the mirror of memory.
+
+Cache are static -> Low in power
+RAM -> High in power
+
+L1 similar kBytes (max MB that is very good)
+How much of the optimization done by the compiler? It depends on the compiler, linear algebra package should be doing this.
+Cache Oblivious Code (recursive decomposition of loops)
+
+I can double transistor in each socket every two Years affordably.
+
+CPU (Ghz 
+The power of changing transistor state will scale with scale, when you add a lot of transister, you have steady static current that is dominant on the chip so the Ghz vannot increase.
+P = CV^2f so parallelism lowers the energy)
+GPU: You create coies of kernel and group them in warps. Using some indexing that is very important.
+
+Vector (SIMD) programming. Source of wasting energy.
+YOU TELL THE COMPILER TO VECTORIZE CODE FOR YOU
+Cpu and GPU in the same memory space is super good as you have very different workloads. Structurally very different.
+	
