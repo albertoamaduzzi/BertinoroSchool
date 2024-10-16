@@ -1,0 +1,297 @@
+Efficient Programming in C++
+- C++ build with copies by default.
+- Cannot push back in const
+
+0) Introduction
+- Statically Typed (A lot of already written objects)
+- general-purpose (Finance,Gaming)
+- multi-paradigm
+    -- Procedural (C)
+    -- Struct and Classes (Encapsulation)
+    -- General Programming (Template)
+    -- Functional Programming (Newer)
+- Good both for low-high level
+- Efficient: You do not pay for what you do not use -> optimization of the compiler transforms the code to optimal 
+- Standard (you can invest on it, as they won't change to new versions.) 
+1) Algorithm
+
+- Regular Expressions are very efficient
+How can you judge from the assembly code?
+STL:
+Input: Sequence of Objects (Iterable)
+a) Non-Modifying:
+- all_of, any:of, for_each, count, count_if. mismatch, equal, find, find_if, adjacent_find, search
+b) Modifying:
+- copy, fill, generate (for random numbers), transform, remove, replace, swap, reverse, rotate
+c) Partitioning:
+partition, stable_partition (keeps the relative order)
+d) Sorting: sort, partial_sort, nth_element (Put the element in the nth position if the element n would be in it sorted position)
+Min/Max: min,max, minmax ...
+e) iota, accumulate, inner_product, partial_sum, adjacent_difference, reduce ...
+
+-- Definition --
+range: [first,last)
+- first == last : empty range
+- last can be used to return failure
+-- ITERATORS --
+: generalization of pointers
+** Always Present **
+*it : access the value
+++ : advance the memory position
+it->next() [Access the next element of the iterator]
+==,!=: it1 is equal/different to it2?
+** Sometimes **
+--,+, -, +=, -=, <
+
+C++20 introduced ranges and library of concepts 
+for(auto it:iterator)
+
+Algorithms in terms of concepts:
+xx Example xx
+
+template <class Iterator, class T>
+Iterator
+find(Iterator first, Iterator last, const T& value)
+{
+for (; first != last; ++first)
+if (*first == value)
+break;
+return first;
+}
+Returns the element that is equal (does not work for string as ++ does not belong to string class)
+
+The concept is a set of requirements tha a type needs to satisfy: supported expressions, nested types, memory layout (i.e. !=,++,* must be defined for class and iterator must be defined)
+
+
+There is a syntax to define concepts.
+
+Node Based data:
+- contains value
+- contains meta-data (pointer to the next element)
+i.e. forward_list
+It depends on the vendor that gives the standard library what is the the organization of the memory for the standard library implementations.
+
+Iterators are the glue between loops and containers
+
+template <class Iterator, class T>
+Iterator find(Iterator first, Iterator last, const T& value)
+{
+for (; first != last; ++first)
+if (*first == value)
+break;
+return first;
+}
+auto it = find(v.begin(), v.end(), 42);
+template <class Iterator, class Predicate>
+Iterator find_if(Iterator first, Iterator last, Predicate pred)
+{
+for (; first != last; ++first)
+if (pred(*first)) // unary predicate
+break;
+return first;
+}
+bool lt42(int n) { return n < 42; }
+auto it = find_if(v.begin(), v.end(), lt42);
+auto it = find_if(v.begin(), v.end(), [](int n) { return n < 42; } );
+
+Advantages:
+- The function is 
+
+#include <random>
+generator_engine -> generate bits
+generator_distribution -> samples from the generated bits
+
+#include <random>
+// random bit generator
+std::default_random_engine eng;
+// generate N 32-bit unsigned integer numbers
+for (int n = 0; n != N; ++n) {
+std::cout << eng() << '\n';
+}
+// generate N floats distributed normally (mean: 0., stddev: 1.)
+std::normal_distribution<float> dist;
+for (int n = 0; n != N; ++n) {
+std::cout << dist(eng) << '\n';
+}
+// generate N ints distributed uniformly between 1 and 6 included
+std::uniform_int_distribution<> roll_dice(1, 6);
+for (int n = 0; n != N; ++n) {
+std::cout << roll_dice(eng) << '\n';
+}
+
+lambda functions create a function type that do cannot be called.
+[=] capture all local variables (global (cin,cout) cannot be captured)
+[=,&k] by value, by reference k.
+
+Capture by reference just if the lambda does not survive the scope.
+The closure of lambda functions are a blob that brings things on it. 
+They create warning but they do not generate errors if 
+-----------------
+Functions: type erased wrapper: lambda,function
+Used to have vector of functions (real, function objects, lambda, member function)
+You cannot put in a vector since you need same type:
+The implementation internally you have
+- base_class (virtual)
+- for each function you make a real instantiation of the object -> make a call to the real object
+
+using Function = std::function<int(int,int)>;
+
+Function f1 { std::plus<int>{} };
+Function f2 { [](int a, int b) { return a * b; } };
+Function f3 { [](auto a, auto b) { return std::gcd(a,b); } };
+
+Very heavy 
+2) Containers
+You cannot always know at compile time how many objects and type in functions (so cannot put static memory stack )
+Example: polymorphism -> 
+struct Shape {},
+struct Rectangel : Shape{}
+struct Circle : Shape{}
+
+You cannot put shape in stack since you will work with rectangle and circles.
+You tell that you need some space, then at run time you allocate.
+Dynamic collections of objects. (You do not know the shape otherwise array)
+
+struct S {
+int n;
+float f;
+double d;
+};
+auto foo_s() {
+S s;
+· · ·
+}
+auto foo_h() {
+S* s = new S;
+· · ·
+}
+ new allocates on heap, pay much attention when you use that.
+ It can be 1 order of magnitude slower
+
+Sequence Containers:
+array, deque, forward_list, list, vector <- you decide the order.
+array: size defined at the run time
+vector: 
+forward_list: contains object and reference to the next
+list: 
+deque: is in chucnks but still is quick
+
+Associative:
+The containers decide the position
+Ordered
+set: default you sort the elements
+multiset: allows multiple elements
+map: dictionary (key,value), they are ordered by the value
+multimap: ... equal_range is useful they return multiple iteraators
+Unordered:
+The elements are ashed and quicker.
+Apply thehash function to the key to obtain position in memory
+
+vector is implemented with three pointers:
+1) begin area memory
+2) first empty memory
+3) End of capacity
+3-2 is the size of the vector
+
+In list you cannot know the size of the list 
+push_* must be O(1) always so for example you do not have push_front() in vectors 
+
+inserting and searching are log(N) in unordered hashed containers.
+Are balanced becouse lower index is on the left and the bigger on the right.
+Node base container: you put in the heap: you need to have three pointers, parent, left and right.
+
+// insert(v.begin(),n) for vector is fast to arrive to nth position and relatively slow to move the elements <=(n-1) on the right
+// it->next()
+
+
+3) Compile Time computation
+
+A lot of effort is put on adding things to compile time.
+It is becoming like an interpreter to C++.
+You can do things with compiler in C++ thanks to template libraries.
+MPL: heavily based on template and on < C++11 technology.
+
+#include <type_traits>
+template<class T, classU>
+template<class T, classU> 
+auto add(T t,U u){std::common_type<T,U> tmp{};
+return t+u;
+}
+
+decltype(t+u) works for all the different types where + is defined as overloaded operator.
+template <typename V> 
+class uniform_distribution{
+static_assert(std::is_floating_point<T>);
+...
+}
+Check that the concept is present for T
+
+Initialize constant object and want to compute the inizilization value and you do not want to do it at compilation time.
+
+Computation of factorial:
+template<int N> 
+struct F{
+    static const int value = N*F<N-1>::value;
+    // compute at compilation time
+}
+
+template<> 
+struct F<0>{
+    static const int value = 1;
+    // compute at compilation time
+}
+^
+|
+You can have spetialization that is possible for template
+
+A function cn be evaluated at compile time
+
+Put constexpr in front of the function or whatever to check things at compile time.
+You want to do it for example with random_access_iterator_tag (that belongs to the std::iterator_traits class)
+
+auto distance(It first, It last) {
+if constexpr (std::is_base_of_v<
+std::random_access_iterator_tag,
+typename std::iterator_traits<It>::iterator_category
+>)
+}
+A concept is written as a template.
+The concept key word allows you to have control on the error, since if some operation is not implemented
+by some class then the error is tremendous.
+You use it as you want to control the error, in such a way that you can say: ok, the problem
+is that the class has not defined the concept.
+
+
+--------
+Function template:
+auto advance(Incrementable auto& t) { ++t; }
+
+C++20 includes also a set of generally useful concepts
+◦ integral, floating_point, derived_from, regular,
+swappable, equality_comparable, invokable, . . .
+
+4) Resource management
+
+
+5) Move semantics
+
+Optimize strings and vectors:
+class String{
+    char *s_;
+} 
+
+How do you specify that your function never fails?
+The vectors have maximum_safe_move -> if you move you must be moving very well otherwise it stops
+
+noexcpet function terminate
+
+noexcept make the function 
+if move() operation should be noexcept since the vector is not able to optimize 
+T& T::operator=(T&& tmp)
+
+noexcept with move start with one object and end up with 2.
+
+If the move constructor is noexcept the 
+
+IF YOU WANT TO PUT YOUR OBJECTS INTO CONTAINER YOU MUST DECLARE THEM AS NOEXCEPT in DEFAULT CONSTRUCTOR AND MOVE.
+6) Additional Material
